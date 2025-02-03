@@ -4,28 +4,36 @@ class PopupViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupLabel()
+    }
 
+    private func setupLabel() {
+        let label = createLabel()
+        view.addSubview(label)
+
+        NSLayoutConstraint.activate([
+            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 20),
+            label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+
+    private func createLabel() -> UIView {
         let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Show Popup View", for: .normal)
         button.addTarget(self, action: #selector(showPopupView), for: .touchUpInside)
 
-        button.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(button)
-
-        NSLayoutConstraint.activate([
-            button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
-            button.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ])
+        return button
     }
 
     @objc func showPopupView(sender: UIButton) {
         let popupView = PopupView()
-        let container = createContainerView()
-        popupView.replaceContentView(container)
-        popupView.show(from: sender, in: view)
+        let container = createContainer()
+        popupView.replaceContent(container)
+        popupView.present(from: sender, in: view)
     }
 
-    private func createContainerView() -> UIView {
+    private func createContainer() -> UIView {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
 
@@ -50,11 +58,23 @@ class PopupViewController: UIViewController {
 
 class PopupView: UIView {
 
-    private var backgroundView: UIView!
+    enum PopupAnchor {
+        case auto
+        case top
+        case bottom
+    }
+
+    private var anchor: PopupAnchor = .bottom
+
+    private var background: UIView!
 
     private var buttonFrame: CGRect = .zero
 
-    private let size = CGSize(width: 300, height: 300)
+    private var size: CGSize = CGSize(width: 300, height: 300)
+
+    private let scaleX: CGFloat = 0.3
+
+    private let scaleY: CGFloat = 0.1
 
     init() {
         super.init(frame: .zero)
@@ -69,21 +89,26 @@ class PopupView: UIView {
         alpha = 0.0
     }
 
-    func replaceContentView(_ view: UIView) {
+    func replaceContent(_ view: UIView) {
         addSubview(view)
         NSLayoutConstraint.match(view: view, in: self)
     }
 
-    func show(from button: UIButton, in parentView: UIView) {
+    func present(
+        from button: UIButton,
+        in parent: UIView,
+        anchor: PopupAnchor = .auto
+    ) {
         guard let superview = button.superview else {
             return
         }
 
-        buttonFrame = superview.convert(button.frame, to: parentView)
+        buttonFrame = superview.convert(button.frame, to: parent)
+        self.anchor = anchor
 
-        setupBackgroundView(in: parentView)
+        setupBackground(in: parent)
 
-        parentView.addSubview(self)
+        parent.addSubview(self)
 
         setupAnimationOut()
 
@@ -92,21 +117,21 @@ class PopupView: UIView {
         }
     }
 
-    private func setupBackgroundView(in parentView: UIView) {
-        backgroundView = UIView(frame: parentView.bounds)
-        backgroundView.alpha = 0.0
-        backgroundView.backgroundColor = UIColor.black
-        backgroundView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismiss)))
-        parentView.addSubview(backgroundView)
+    private func setupBackground(in parent: UIView) {
+        background = UIView(frame: parent.bounds)
+        background.alpha = 0.0
+        background.backgroundColor = UIColor.black
+        background.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismiss)))
+        parent.addSubview(background)
 
-        NSLayoutConstraint.match(view: backgroundView, in: parentView)
+        NSLayoutConstraint.match(view: background, in: parent)
     }
 
     @objc func dismiss() {
         animate {
             self.setupAnimationOut()
         } completion: {
-            self.backgroundView.removeFromSuperview()
+            self.background.removeFromSuperview()
             self.removeFromSuperview()
         }
     }
@@ -129,13 +154,11 @@ class PopupView: UIView {
     }
 
     private func setupAnimationOut() {
-        let scaleX: CGFloat = 0.3
-
         alpha = 0.0
-        transform = CGAffineTransform(scaleX: scaleX, y: 0.1)
-        frame = frameStart(scaleX: 0.1)
+        transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
+        frame = frameStart(scaleX: scaleX)
 
-        backgroundView.alpha = 0.0
+        background.alpha = 0.0
 
         layoutIfNeeded()
     }
@@ -145,21 +168,39 @@ class PopupView: UIView {
         transform = .identity
         frame = frameEnd()
 
-        backgroundView.alpha = 0.1
+        background.alpha = 0.1
 
         layoutIfNeeded()
     }
 
     private func frameStart(scaleX: CGFloat) -> CGRect {
+        if anchor == .top {
+            return CGRect(
+                x: buttonFrame.minX + (buttonFrame.width - size.width * scaleX) / 2,
+                y: buttonFrame.minY - size.height * scaleY,
+                width: size.width * scaleX,
+                height: size.height * scaleY
+            )
+        }
+
         return CGRect(
             x: buttonFrame.minX + (buttonFrame.width - size.width * scaleX) / 2,
             y: buttonFrame.maxY,
             width: size.width * scaleX,
-            height: size.height * 0.1
+            height: size.height * scaleY
         )
     }
 
     private func frameEnd() -> CGRect {
+        if anchor == .top {
+            return CGRect(
+                x: buttonFrame.maxX - size.width,
+                y: buttonFrame.minY - size.height,
+                width: size.width,
+                height: size.height
+            )
+        }
+
         return CGRect(
             x: buttonFrame.maxX - size.width,
             y: buttonFrame.maxY,
