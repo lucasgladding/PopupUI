@@ -1,61 +1,5 @@
 import UIKit
 
-class PopupViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupLabel()
-    }
-
-    private func setupLabel() {
-        let label = createLabel()
-        view.addSubview(label)
-
-        NSLayoutConstraint.activate([
-            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 20),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ])
-    }
-
-    private func createLabel() -> UIView {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Show Popup View", for: .normal)
-        button.addTarget(self, action: #selector(showPopupView), for: .touchUpInside)
-
-        return button
-    }
-
-    @objc func showPopupView(sender: UIButton) {
-        let popupView = PopupView()
-        let container = createContainer()
-        popupView.replaceContent(container)
-        popupView.present(from: sender, in: view)
-    }
-
-    private func createContainer() -> UIView {
-        let container = UIView()
-        container.translatesAutoresizingMaskIntoConstraints = false
-
-        container.layer.backgroundColor = UIColor.white.cgColor
-        container.layer.cornerRadius = 10
-        container.layer.shadowColor = UIColor.black.cgColor
-        container.layer.shadowOpacity = 0.1
-        container.layer.shadowRadius = 50
-
-        let label = UILabel()
-        label.text = SampleContent.text
-        label.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(label)
-
-        NSLayoutConstraint.match(view: label, in: container)
-
-        return container
-    }
-}
-
-// MARK: - Custom Popup View
-
 class PopupView: UIView {
 
     enum PopupAnchor {
@@ -64,7 +8,7 @@ class PopupView: UIView {
         case bottom
     }
 
-    private var anchor: PopupAnchor = .bottom
+    private var anchor: PopupAnchor = .auto
 
     private var background: UIView!
 
@@ -81,12 +25,12 @@ class PopupView: UIView {
         setup()
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
     private func setup() {
         alpha = 0.0
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     func replaceContent(_ view: UIView) {
@@ -103,8 +47,8 @@ class PopupView: UIView {
             return
         }
 
-        buttonFrame = superview.convert(button.frame, to: parent)
         self.anchor = anchor
+        self.buttonFrame = superview.convert(button.frame, to: parent)
 
         setupBackground(in: parent)
 
