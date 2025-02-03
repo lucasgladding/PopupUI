@@ -12,6 +12,8 @@ class PopupView: UIView {
 
     private var background: UIView!
 
+    private var content: UIView!
+
     private var buttonFrame: CGRect = .zero
 
     private var size: CGSize = CGSize(width: 300, height: 300)
@@ -34,6 +36,10 @@ class PopupView: UIView {
     }
 
     func replaceContent(_ view: UIView) {
+        if content != nil {
+            content.removeFromSuperview()
+        }
+        content = view
         addSubview(view)
         NSLayoutConstraint.match(view: view, in: self)
     }
@@ -71,7 +77,8 @@ class PopupView: UIView {
         NSLayoutConstraint.match(view: background, in: parent)
     }
 
-    @objc func dismiss() {
+    @objc
+    private func dismiss() {
         animate {
             self.setupAnimationOut()
         } completion: {
@@ -80,7 +87,7 @@ class PopupView: UIView {
         }
     }
 
-    func animate(
+    private func animate(
         animations: @escaping () -> Void,
         completion: @escaping () -> Void = {}
     ) {
