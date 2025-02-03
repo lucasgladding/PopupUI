@@ -14,7 +14,7 @@ class PopupView: UIView {
 
     private var content: UIView!
 
-    private var buttonFrame: CGRect = .zero
+    private var originFrame: CGRect = .zero
 
     private var size: CGSize = CGSize(width: 300, height: 300)
 
@@ -45,16 +45,16 @@ class PopupView: UIView {
     }
 
     func present(
-        from button: UIButton,
+        from origin: UIView,
         in parent: UIView,
         anchor: Anchor = .auto
     ) {
-        guard let superview = button.superview else {
+        guard let superview = origin.superview else {
             return
         }
 
         self.anchor = anchor
-        buttonFrame = superview.convert(button.frame, to: parent)
+        originFrame = superview.convert(origin.frame, to: parent)
 
         setupBackground(in: parent)
 
@@ -127,16 +127,16 @@ class PopupView: UIView {
     var frameStart: CGRect {
         if anchor == .top {
             return CGRect(
-                x: buttonFrame.minX + (buttonFrame.width - size.width * scaleX) / 2,
-                y: buttonFrame.minY - size.height * scaleY,
+                x: originFrame.minX + (originFrame.width - size.width * scaleX) / 2,
+                y: originFrame.minY - size.height * scaleY,
                 width: size.width * scaleX,
                 height: size.height * scaleY
             )
         }
 
         return CGRect(
-            x: buttonFrame.minX + (buttonFrame.width - size.width * scaleX) / 2,
-            y: buttonFrame.maxY,
+            x: originFrame.minX + (originFrame.width - size.width * scaleX) / 2,
+            y: originFrame.maxY,
             width: size.width * scaleX,
             height: size.height * scaleY
         )
@@ -145,16 +145,16 @@ class PopupView: UIView {
     private var frameEnd: CGRect {
         if anchor == .top {
             return CGRect(
-                x: buttonFrame.maxX - size.width,
-                y: buttonFrame.minY - size.height,
+                x: originFrame.maxX - size.width,
+                y: originFrame.minY - size.height,
                 width: size.width,
                 height: size.height
             )
         }
 
         return CGRect(
-            x: buttonFrame.maxX - size.width,
-            y: buttonFrame.maxY,
+            x: originFrame.maxX - size.width,
+            y: originFrame.maxY,
             width: size.width,
             height: size.height
         )
