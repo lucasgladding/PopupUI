@@ -54,7 +54,7 @@ class PopupView: UIView {
         }
 
         self.anchor = anchor
-        self.buttonFrame = superview.convert(button.frame, to: parent)
+        buttonFrame = superview.convert(button.frame, to: parent)
 
         setupBackground(in: parent)
 
