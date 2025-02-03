@@ -2,13 +2,13 @@ import UIKit
 
 class PopupView: UIView {
 
-    enum PopupAnchor {
+    enum Anchor {
         case auto
         case top
         case bottom
     }
 
-    private var anchor: PopupAnchor = .auto
+    private var anchor: Anchor = .auto
 
     private var background: UIView!
 
@@ -47,7 +47,7 @@ class PopupView: UIView {
     func present(
         from button: UIButton,
         in parent: UIView,
-        anchor: PopupAnchor = .auto
+        anchor: Anchor = .auto
     ) {
         guard let superview = button.superview else {
             return
@@ -107,7 +107,7 @@ class PopupView: UIView {
     private func setupAnimationOut() {
         alpha = 0.0
         transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
-        frame = frameStart(scaleX: scaleX)
+        frame = frameStart
 
         background.alpha = 0.0
 
@@ -117,14 +117,14 @@ class PopupView: UIView {
     private func setupAnimationIn() {
         alpha = 1.0
         transform = .identity
-        frame = frameEnd()
+        frame = frameEnd
 
         background.alpha = 0.1
 
         layoutIfNeeded()
     }
 
-    private func frameStart(scaleX: CGFloat) -> CGRect {
+    var frameStart: CGRect {
         if anchor == .top {
             return CGRect(
                 x: buttonFrame.minX + (buttonFrame.width - size.width * scaleX) / 2,
@@ -142,7 +142,7 @@ class PopupView: UIView {
         )
     }
 
-    private func frameEnd() -> CGRect {
+    private var frameEnd: CGRect {
         if anchor == .top {
             return CGRect(
                 x: buttonFrame.maxX - size.width,
