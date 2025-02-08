@@ -9,7 +9,7 @@ class SamplePopupViewController: UIViewController {
     }
 
     private func setup() {
-        let hostingController = UIHostingController(rootView: SampleButtonPopup())
+        let hostingController = UIHostingController(rootView: SamplePopup())
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(hostingController.view)
 

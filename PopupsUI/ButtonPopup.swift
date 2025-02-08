@@ -41,8 +41,7 @@ private struct ButtonPopupRepresentable<Content: View>: UIViewRepresentable {
 
     func updateUIView(_ button: UIButton, context: Context) {
         button.setTitle(title, for: .normal)
-
-        context.coordinator.content = content
+        context.coordinator.setContent(content())
     }
 
     func sizeThatFits(
@@ -54,26 +53,22 @@ private struct ButtonPopupRepresentable<Content: View>: UIViewRepresentable {
     }
 
     class Coordinator {
-        var content: () -> Content
+        var contentController: UIHostingController<Content>
 
         init(content: @escaping () -> Content) {
-            self.content = content
+            self.contentController = UIHostingController(rootView: content())
+            self.contentController.view.translatesAutoresizingMaskIntoConstraints = false
+            self.contentController.view.layer.cornerRadius = 10
+        }
+
+        func setContent(_ content: Content) {
+            contentController.rootView = content
         }
 
         @objc
         func present(_ sender: UIButton) {
-            let contentController = UIHostingController(rootView: content())
-
-            guard let view = contentController.view else {
-                return
-            }
-
-            view.translatesAutoresizingMaskIntoConstraints = false
-
-            view.layer.cornerRadius = 10
-
             let popupView = PopupView()
-            popupView.setContentView(view)
+            popupView.setContentView(contentController.view)
 
             if let window = sender.window {
                 popupView.present(from: sender, in: window)
@@ -83,5 +78,5 @@ private struct ButtonPopupRepresentable<Content: View>: UIViewRepresentable {
 }
 
 #Preview {
-    SampleButtonPopup()
+    SamplePopup()
 }
