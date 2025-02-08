@@ -1,8 +1,8 @@
 import SwiftUI
 
-struct SamplePopupButton: View {
+struct SampleButtonPopup: View {
     var body: some View {
-        PopupButton(title: "Open Popup") {
+        ButtonPopup(title: "Open Popup") {
             Text(SampleContent.text)
                 .padding()
         }
@@ -12,7 +12,7 @@ struct SamplePopupButton: View {
 #Preview {
     HStack {
         Spacer()
-        SamplePopupButton()
+        SampleButtonPopup()
     }
     .padding()
 }

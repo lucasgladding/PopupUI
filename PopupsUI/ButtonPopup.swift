@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-struct PopupButton<Content: View>: View {
+struct ButtonPopup<Content: View>: View {
     var title: String
     var content: () -> Content
 
@@ -14,11 +14,11 @@ struct PopupButton<Content: View>: View {
     }
 
     var body: some View {
-        PopupButtonRepresentable(title: title, content: content)
+        ButtonPopupRepresentable(title: title, content: content)
     }
 }
 
-private struct PopupButtonRepresentable<Content: View>: UIViewRepresentable {
+private struct ButtonPopupRepresentable<Content: View>: UIViewRepresentable {
     var title: String
     var content: () -> Content
 
@@ -83,5 +83,5 @@ private struct PopupButtonRepresentable<Content: View>: UIViewRepresentable {
 }
 
 #Preview {
-    SamplePopupButton()
+    SampleButtonPopup()
 }
