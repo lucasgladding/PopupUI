@@ -73,7 +73,7 @@ private struct PopupButtonRepresentable<Content: View>: UIViewRepresentable {
             view.layer.cornerRadius = 10
 
             let popupView = PopupView()
-            popupView.replaceContent(view)
+            popupView.setContentView(view)
 
             if let window = sender.window {
                 popupView.present(from: sender, in: window)

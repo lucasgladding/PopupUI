@@ -2,24 +2,21 @@ import UIKit
 
 class PopupView: UIView {
 
-    enum Anchor {
+    enum Edge {
         case auto
         case top
         case bottom
     }
 
-    private var anchor: Anchor = .auto
-
-    private var background: UIView!
-
-    private var content: UIView!
+    private var backgroundView: UIView!
+    private var contentView: UIView!
 
     private var originFrame: CGRect = .zero
+    private var originEdge: Edge = .auto
 
     private var size: CGSize = CGSize(width: 300, height: 300)
 
     private let scaleX: CGFloat = 0.3
-
     private let scaleY: CGFloat = 0.1
 
     init() {
@@ -35,28 +32,30 @@ class PopupView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func replaceContent(_ view: UIView) {
-        if content != nil {
-            content.removeFromSuperview()
+    func setContentView(_ view: UIView) {
+        if contentView != nil {
+            contentView.removeFromSuperview()
         }
-        content = view
+
+        contentView = view
         addSubview(view)
+
         NSLayoutConstraint.match(view: view, in: self)
     }
 
     func present(
         from origin: UIView,
         in parent: UIView,
-        anchor: Anchor = .auto
+        originEdge: Edge = .auto
     ) {
         guard let superview = origin.superview else {
             return
         }
 
-        self.anchor = anchor
-        originFrame = superview.convert(origin.frame, to: parent)
+        self.originFrame = superview.convert(origin.frame, to: parent)
+        self.originEdge = originEdge
 
-        setupBackground(in: parent)
+        setupBackgroundView(in: parent)
 
         parent.addSubview(self)
 
@@ -67,14 +66,14 @@ class PopupView: UIView {
         }
     }
 
-    private func setupBackground(in parent: UIView) {
-        background = UIView(frame: parent.bounds)
-        background.alpha = 0.0
-        background.backgroundColor = UIColor.black
-        background.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismiss)))
-        parent.addSubview(background)
+    private func setupBackgroundView(in parent: UIView) {
+        backgroundView = UIView(frame: parent.bounds)
+        backgroundView.alpha = 0.0
+        backgroundView.backgroundColor = UIColor.black
+        backgroundView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismiss)))
+        parent.addSubview(backgroundView)
 
-        NSLayoutConstraint.match(view: background, in: parent)
+        NSLayoutConstraint.match(view: backgroundView, in: parent)
     }
 
     @objc
@@ -82,7 +81,7 @@ class PopupView: UIView {
         animate {
             self.setupAnimationOut()
         } completion: {
-            self.background.removeFromSuperview()
+            self.backgroundView.removeFromSuperview()
             self.removeFromSuperview()
         }
     }
@@ -105,27 +104,27 @@ class PopupView: UIView {
     }
 
     private func setupAnimationOut() {
-        alpha = 0.0
         transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
         frame = frameStart
+        alpha = 0.0
 
-        background.alpha = 0.0
+        backgroundView.alpha = 0.0
 
         layoutIfNeeded()
     }
 
     private func setupAnimationIn() {
-        alpha = 1.0
         transform = .identity
         frame = frameEnd
+        alpha = 1.0
 
-        background.alpha = 0.1
+        backgroundView.alpha = 0.1
 
         layoutIfNeeded()
     }
 
     var frameStart: CGRect {
-        if anchor == .top {
+        if originEdge == .top {
             return CGRect(
                 x: originFrame.minX + (originFrame.width - size.width * scaleX) / 2,
                 y: originFrame.minY - size.height * scaleY,
@@ -143,7 +142,7 @@ class PopupView: UIView {
     }
 
     private var frameEnd: CGRect {
-        if anchor == .top {
+        if originEdge == .top {
             return CGRect(
                 x: originFrame.maxX - size.width,
                 y: originFrame.minY - size.height,
