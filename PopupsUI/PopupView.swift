@@ -2,7 +2,7 @@ import UIKit
 
 class PopupView: UIView {
 
-    enum OriginEdge {
+    enum SourceEdge {
         case auto
         case top
         case bottom
@@ -11,8 +11,8 @@ class PopupView: UIView {
     private var backgroundView: UIView!
     private var contentView: UIView!
 
-    private var originFrame: CGRect = .zero
-    private var originEdge: OriginEdge = .auto
+    private var sourceRect: CGRect = .zero
+    private var sourceEdge: SourceEdge = .auto
 
     private var size: CGSize = CGSize(width: 300, height: 300)
 
@@ -44,16 +44,16 @@ class PopupView: UIView {
     }
 
     func present(
-        from origin: UIView,
+        from source: UIView,
         in parent: UIView,
-        originEdge: OriginEdge = .auto
+        sourceEdge: SourceEdge = .auto
     ) {
-        guard let superview = origin.superview else {
+        guard let superview = source.superview else {
             return
         }
 
-        self.originFrame = superview.convert(origin.frame, to: parent)
-        self.originEdge = originEdge
+        self.sourceRect = superview.convert(source.frame, to: parent)
+        self.sourceEdge = sourceEdge
 
         setupBackgroundView(in: parent)
 
@@ -124,36 +124,36 @@ class PopupView: UIView {
     }
 
     var frameStart: CGRect {
-        if originEdge == .top {
+        if sourceEdge == .top {
             return CGRect(
-                x: originFrame.minX + (originFrame.width - size.width * scaleX) / 2,
-                y: originFrame.minY - size.height * scaleY,
+                x: sourceRect.minX + (sourceRect.width - size.width * scaleX) / 2,
+                y: sourceRect.minY - size.height * scaleY,
                 width: size.width * scaleX,
                 height: size.height * scaleY
             )
         }
 
         return CGRect(
-            x: originFrame.minX + (originFrame.width - size.width * scaleX) / 2,
-            y: originFrame.maxY,
+            x: sourceRect.minX + (sourceRect.width - size.width * scaleX) / 2,
+            y: sourceRect.maxY,
             width: size.width * scaleX,
             height: size.height * scaleY
         )
     }
 
     private var frameEnd: CGRect {
-        if originEdge == .top {
+        if sourceEdge == .top {
             return CGRect(
-                x: originFrame.maxX - size.width,
-                y: originFrame.minY - size.height,
+                x: sourceRect.maxX - size.width,
+                y: sourceRect.minY - size.height,
                 width: size.width,
                 height: size.height
             )
         }
 
         return CGRect(
-            x: originFrame.maxX - size.width,
-            y: originFrame.maxY,
+            x: sourceRect.maxX - size.width,
+            y: sourceRect.maxY,
             width: size.width,
             height: size.height
         )
