@@ -2,7 +2,7 @@ import UIKit
 
 class PopupView: UIView {
 
-    enum Edge {
+    enum OriginEdge {
         case auto
         case top
         case bottom
@@ -12,7 +12,7 @@ class PopupView: UIView {
     private var contentView: UIView!
 
     private var originFrame: CGRect = .zero
-    private var originEdge: Edge = .auto
+    private var originEdge: OriginEdge = .auto
 
     private var size: CGSize = CGSize(width: 300, height: 300)
 
@@ -46,7 +46,7 @@ class PopupView: UIView {
     func present(
         from origin: UIView,
         in parent: UIView,
-        originEdge: Edge = .auto
+        originEdge: OriginEdge = .auto
     ) {
         guard let superview = origin.superview else {
             return
