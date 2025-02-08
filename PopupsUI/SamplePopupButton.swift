@@ -3,11 +3,16 @@ import SwiftUI
 struct SamplePopupButton: View {
     var body: some View {
         PopupButton(title: "Open Popup") {
-            Text("Popup Content")
+            Text(SampleContent.text)
+                .padding()
         }
     }
 }
 
 #Preview {
-    SamplePopupButton()
+    HStack {
+        Spacer()
+        SamplePopupButton()
+    }
+    .padding()
 }
